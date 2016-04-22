@@ -24,13 +24,13 @@ public class StockGUI extends Application{
 		Menu managePortfolio = new Menu("Portfolio Management");
 		
 		MenuItem addStock = new MenuItem("Add a Stock");
-		addStock.setOnAction(e -> placeHolder("add"));
+		addStock.setOnAction(e -> StockGUIActionHandlers.placeHolder("add"));
 				
 		Menu editStock = new Menu("Edit a Stock");
 		for (int i = 0; i < symbolArray.length; i++){	
 			String tempSymbol = symbolArray[i]; 
 			stocksEdit[i] = new MenuItem(symbolArray[i]);
-			stocksEdit[i].setOnAction(e -> placeHolder(tempSymbol));
+			stocksEdit[i].setOnAction(e -> StockGUIActionHandlers.placeHolder(tempSymbol));
 		}
 		editStock.getItems().addAll(stocksEdit);
 		
@@ -38,7 +38,7 @@ public class StockGUI extends Application{
 		for (int i = 0; i < symbolArray.length; i++){	
 			String tempSymbol = symbolArray[i]; 
 			stocksDelete[i] = new MenuItem(symbolArray[i]);
-			stocksDelete[i].setOnAction(e -> placeHolder(tempSymbol));
+			stocksDelete[i].setOnAction(e -> StockGUIActionHandlers.placeHolder(tempSymbol));
 		}
 		deleteStock.getItems().addAll(stocksDelete);
 				
@@ -66,16 +66,7 @@ public class StockGUI extends Application{
 		
 	}
 	
-	public static void exitApp() {
-		System.out.println("Exit Method Invoked");
-	}
-
-	public void placeHolder(String symbol) {
-		System.out.println("Place Holder Invoked: " + symbol);
-	}
-
 	public static void main(String[] args){
 		launch();
 	}
-
 }

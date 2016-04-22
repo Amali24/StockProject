@@ -22,7 +22,7 @@ public class CloseConfirm{
 		label.setText(message);
 		
 		Button okayButton = new Button("Confirm");
-		okayButton.setOnAction(e -> StockGUI.exitApp());
+		okayButton.setOnAction(e -> StockGUIActionHandlers.exitApp());
 		
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(e -> window.close());
