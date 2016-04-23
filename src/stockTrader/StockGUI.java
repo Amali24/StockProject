@@ -1,5 +1,7 @@
 package stockTrader;
 
+import java.text.DecimalFormat;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -187,22 +189,25 @@ public class StockGUI extends Application{
 		
 		name.setText(tempStock.getName());
 		
+		DecimalFormat money = new DecimalFormat("$ ###,###,###.00");
+		DecimalFormat bigNumber = new DecimalFormat("###,###,###");
+		
 		tbsymbol.setText(tempStock.getSymbol());
-		tbprice.setText("" + tempStock.getPrice());
-		tbvolume.setText("" + tempStock.getVolume());
+		tbprice.setText("" + money.format(tempStock.getPrice()));
+		tbvolume.setText("" + bigNumber.format(tempStock.getVolume()));
 		tbpe.setText("" + tempStock.getPe());
 		tbeps.setText("" + tempStock.getEps());
-		tbweek52low.setText("" + tempStock.getWeek52low());
-		tbweek52high.setText("" + tempStock.getWeek52low());
-		tbdaylow.setText("" + tempStock.getDaylow());
-		tbdayhigh.setText("" + tempStock.getDayhigh());
-		tbmovingav50day.setText("" + tempStock.getMovingav50day());
+		tbweek52low.setText("" + money.format(tempStock.getWeek52low()));
+		tbweek52high.setText("" + money.format(tempStock.getWeek52high()));
+		tbdaylow.setText("" + money.format(tempStock.getDaylow()));
+		tbdayhigh.setText("" + money.format(tempStock.getDayhigh()));
+		tbmovingav50day.setText("" + money.format(tempStock.getMovingav50day()));
 		tbmarketcap.setText(tempStock.getMarketcap());
 		tbshortRatio.setText("" + tempStock.getShortRatio());
-		tbpreviousClose.setText("" + tempStock.getPreviousClose());
-		tbopen.setText("" + tempStock.getOpen());
+		tbpreviousClose.setText("" + money.format(tempStock.getPreviousClose()));
+		tbopen.setText("" + money.format(tempStock.getOpen()));
 		tbexchange.setText(tempStock.getExchange());
-		tbmovingav200Day.setText("" + tempStock.getMovingav200Day());
+		tbmovingav200Day.setText("" + money.format(tempStock.getMovingav200Day()));
 	}
 	
 	public static void main(String[] args){
