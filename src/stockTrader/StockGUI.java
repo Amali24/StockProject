@@ -1,6 +1,7 @@
 package stockTrader;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -45,22 +46,28 @@ public class StockGUI extends Application{
 	
 	// Text Object to display name of stock, defaults to "No Stock Loaded"
 	Text name = new Text("No Stock Loaded");
-
-	
+		
 	@Override
 	public void start(Stage primaryStage){
 		Stage window = primaryStage; // "re-name" primaryStage for ease of use
 		window.setMinWidth(730); // Establish minimum width of stage for even spacing throughout
 		
-		String[] symbolArray = {"FB", "GOOGL", "MSFT", "AAPL"}; // Holds symbols of held stocks
+		ArrayList<String> symbolArray = new ArrayList<String>(5); // Holds symbols of held stocks
 		
-		int numStocks = symbolArray.length; // number of stocks
+		symbolArray.add("FB");
+		symbolArray.add("MSFT");
+		symbolArray.add("GOOGL");
+
+		int numStocks = symbolArray.size(); // number of stocks
+		// Menu and Button ArrayLists to Dynamically Create Menus and Buttons
+		ArrayList<MenuItem> stocksDelete = new ArrayList<MenuItem>(numStocks);
+		ArrayList<Button> stocksView = new ArrayList<Button>(numStocks);
 		
-		// Menu and Button Array to Dynamically Create Menus and Buttons
-		MenuItem[] stocksDelete;
-		Button[] stocksView;
-		stocksDelete = new MenuItem[numStocks];
-		stocksView = new Button[numStocks];
+		// Create VBox for stock buttons
+		VBox leftBar = new VBox(5);
+		
+		// Delete Stock sub-menu (dynamically lists currently added stocks
+		Menu deleteStock = new Menu("Delete a Stock");
 		
 		// File Menu
 		Menu file = new Menu("File");
@@ -68,17 +75,15 @@ public class StockGUI extends Application{
 		Menu managePortfolio = new Menu("Portfolio Management");
 		// Add Stock menuItem for adding new stock to portfolio
 		MenuItem addStock = new MenuItem("Add a Stock");
-		addStock.setOnAction(e -> addStock());
-		
-		// Delete Stock sub-menu (dynamically lists currently added stocks
-		Menu deleteStock = new Menu("Delete a Stock");
+		addStock.setOnAction(e -> addStock(symbolArray, stocksView, stocksDelete, leftBar, deleteStock));
 		
 		// Create Dynamic Menu
 		for (int i = 0; i < numStocks; i++){	
-			String tempSymbol = symbolArray[i]; 
-			stocksDelete[i] = new MenuItem(symbolArray[i]);
-			stocksDelete[i].setOnAction(e -> StockGUIActionHandlers.placeHolder(tempSymbol));
+			String tempSymbol = symbolArray.get(i); 
+			stocksDelete.add(i, new MenuItem(symbolArray.get(i)));
+			stocksDelete.get(i).setOnAction(e -> deleteStock(tempSymbol, symbolArray, stocksView, stocksDelete, leftBar, deleteStock));
 		}
+		
 		// Add dynamic list of stocks to delete stock menu
 		deleteStock.getItems().addAll(stocksDelete);
 		
@@ -99,16 +104,13 @@ public class StockGUI extends Application{
 		// Display Credits
 		credits.setOnAction(e -> AlertBox.display("About Stock Advisor", "Stock Advisor was created by Alessandra Shipman & Andrew Thomas"));
 		
-		// Create VBox or stock buttons
-		VBox leftBar = new VBox(5);
-		
 		// Dyanmically create button for each stock in array
 		for (int i = 0; i < numStocks; i++){
-			String tempSymbol = symbolArray[i];
-			stocksView[i] = new Button(symbolArray[i]);
-			stocksView[i].setMaxWidth(66);
-			stocksView[i].setMinWidth(66);
-			stocksView[i].setOnAction(e -> displayStockInfo(tempSymbol));
+			String tempSymbol = symbolArray.get(i);
+			stocksView.add(i, new Button(symbolArray.get(i)));
+			stocksView.get(i).setMaxWidth(66);
+			stocksView.get(i).setMinWidth(66);
+			stocksView.get(i).setOnAction(e -> displayStockInfo(tempSymbol));
 		}
 		
 		// Add dynamic buttons to leftBar
@@ -226,25 +228,22 @@ public class StockGUI extends Application{
 		window.show();
 						
 	}
-	
-	private void addStock() {
-		// TODO finish this method
-		
-		Stage window = new Stage();
-		window.initModality(Modality.APPLICATION_MODAL);
-		window.setTitle("Add a Stock");
-		window.setMinWidth(250);
+
+	private void addStock(ArrayList<String> symbolArray, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file) {		
+		Stage addStockwindow = new Stage();
+
+		addStockwindow.initModality(Modality.APPLICATION_MODAL);
+		addStockwindow.setTitle("Add a Stock");
+		addStockwindow.setMinWidth(250);
 		
 		Label symbol = new Label("Symbol: ");
 		TextField symbolTB = new TextField();
-		
-		String symbolIn = symbolTB.getText(); 
-		
+				
 		Button okay = new Button("Add");
-		okay.setOnAction(e -> addToStockArray(symbolIn));
+		okay.setOnAction(e -> addToStockArray(symbolTB, symbolArray, addStockwindow, stocksView, stocksDelete, leftBar, file));
 		
 		Button cancel = new Button("Cancel");
-		cancel.setOnAction(e -> window.close());
+		cancel.setOnAction(e -> addStockwindow.close());
 		
 		GridPane pane = new GridPane();
 		
@@ -254,13 +253,53 @@ public class StockGUI extends Application{
 		pane.add(cancel, 1, 1);
 		
 		Scene scene = new Scene(pane);
-		window.setScene(scene);
-		window.showAndWait();
+		addStockwindow.setScene(scene);
+		addStockwindow.showAndWait();
 		
 	}
 
-	private void addToStockArray(String symbolIn) {
-		//TODO write this shit
+	private void addToStockArray(TextField input, ArrayList<String> symbolIn, Stage addStockwindow, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file) {
+		String symbolInput = input.getText();
+		Stock tempStock = StockFetcher.getStock(symbolInput);
+		if(!(tempStock.getName().equals("N/A"))){
+			symbolIn.add(symbolInput);
+			addNewStockButton(symbolInput, stocksView, leftBar);
+			addNewStockMenuItem(symbolInput, symbolIn, stocksView, stocksDelete, leftBar, file);
+			addStockwindow.close();
+		}
+		else
+			AlertBox.display("Invalid Symbol", "ERROR: Stock Not Found. Please Try Again.");
+	}
+	
+	private void addNewStockButton(String symbol, ArrayList<Button> stocksView, VBox leftBar){
+		Button newStock = new Button(symbol);
+		newStock.setMaxWidth(66);
+		newStock.setMinWidth(66);
+		newStock.setOnAction(e -> displayStockInfo(symbol));
+		stocksView.add(newStock);
+		leftBar.getChildren().clear();
+		leftBar.getChildren().addAll(stocksView);
+	}
+	
+	private void addNewStockMenuItem(String symbol, ArrayList<String> symbolArray, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file){
+		MenuItem newStock= new MenuItem(symbol);
+		newStock.setOnAction(e -> deleteStock(symbol, symbolArray, stocksView, stocksDelete, leftBar, file));
+		stocksDelete.add(newStock);
+		file.getItems().clear();
+		file.getItems().addAll(stocksDelete);
+	}
+	
+	public void deleteStock(String symbol, ArrayList<String> symbolArray, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file){
+		int i = symbolArray.indexOf(symbol);
+		symbolArray.remove(i);
+		stocksView.remove(i);
+		stocksDelete.remove(i);
+		
+		file.getItems().clear();
+		file.getItems().addAll(stocksDelete);
+		
+		leftBar.getChildren().clear();
+		leftBar.getChildren().addAll(stocksView);
 	}
 
 	public void displayStockInfo(String symbol) {
@@ -285,7 +324,7 @@ public class StockGUI extends Application{
 		tbdaylow.setText("" + money.format(tempStock.getDaylow()));
 		tbdayhigh.setText("" + money.format(tempStock.getDayhigh()));
 		tbmovingav50day.setText("" + money.format(tempStock.getMovingav50day()));
-		tbmarketcap.setText(tempStock.getMarketcap());
+		tbmarketcap.setText("$ " + tempStock.getMarketcap());
 		tbshortRatio.setText("" + tempStock.getShortRatio());
 		tbpreviousClose.setText("" + money.format(tempStock.getPreviousClose()));
 		tbopen.setText("" + money.format(tempStock.getOpen()));

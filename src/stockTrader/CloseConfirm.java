@@ -40,7 +40,6 @@ public class CloseConfirm{
 	}
 	
 	private static void exitApp() {
-		System.out.println("Exit Method Invoked");
 		System.exit(0);
 	}
 }
