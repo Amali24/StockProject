@@ -22,7 +22,7 @@ public class CloseConfirm{
 		label.setText(message);
 		
 		Button okayButton = new Button("Confirm");
-		okayButton.setOnAction(e -> StockGUIActionHandlers.exitApp());
+		okayButton.setOnAction(e -> exitApp());
 		
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(e -> window.close());
@@ -37,5 +37,10 @@ public class CloseConfirm{
 		Scene scene = new Scene(vBox);
 		window.setScene(scene);
 		window.showAndWait();
+	}
+	
+	private static void exitApp() {
+		System.out.println("Exit Method Invoked");
+		System.exit(0);
 	}
 }
