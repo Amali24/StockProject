@@ -118,7 +118,7 @@ public class Stock {
 		}else if(numShortTerm < .99){
 			setShortTermRec("Short");
 		}else{
-			setShortTermRec("No Reccomendation");
+			setShortTermRec("No Recommendation");
 		}
 		
 		if(numLongTerm > 1.05){
@@ -128,7 +128,7 @@ public class Stock {
 		}else if(numLongTerm < .99){
 			setLongTermRec("Sell");
 		}else{
-			setLongTermRec("No Reccomendation");
+			setLongTermRec("No Recommendation");
 		}	
 	}
 
