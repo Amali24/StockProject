@@ -15,7 +15,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -104,7 +107,7 @@ public class StockGUI extends Application{
 		// Display Credits
 		credits.setOnAction(e -> AlertBox.display("About Stock Advisor", "Stock Advisor was created by Alessandra Shipman & Andrew Thomas"));
 		
-		// Dyanmically create button for each stock in array
+		// Dynamically create button for each stock in array
 		for (int i = 0; i < numStocks; i++){
 			String tempSymbol = symbolArray.get(i);
 			stocksView.add(i, new Button(symbolArray.get(i)));
@@ -119,6 +122,18 @@ public class StockGUI extends Application{
 		// Create two border panes
 		BorderPane bPane = new BorderPane();
 		BorderPane aPane = new BorderPane();
+		
+		HBox recPane = new HBox(10);
+		Text recText = new Text("Recommendation: Buy");
+		recText.setFont(Font.font("Helvetica", FontWeight.BOLD, 18));
+
+		Polygon upArrow = new Polygon(
+				10, 0,
+				0, 10,
+				20, 10);
+		upArrow.setFill(Color.GREEN);
+		recPane.getChildren().addAll(recText, upArrow);
+		recPane.setAlignment(Pos.CENTER);
 		
 		// MenuBar holds previously created menus
 		MenuBar toolbar = new MenuBar(file, about);
@@ -208,8 +223,10 @@ public class StockGUI extends Application{
 		//Position name
 		aPane.setTop(name);
 		BorderPane.setAlignment(name, Pos.CENTER);
+		
 		// Position grid pane with labels and fields
 		aPane.setCenter(gPane);
+		aPane.setBottom(recPane);
 		
 		// Position toolbar and other panes
 		bPane.setTop(toolbar);
@@ -272,7 +289,7 @@ public class StockGUI extends Application{
 	}
 	
 	private void addNewStockButton(String symbol, ArrayList<Button> stocksView, VBox leftBar){
-		Button newStock = new Button(symbol);
+		Button newStock = new Button(symbol.toUpperCase());
 		newStock.setMaxWidth(66);
 		newStock.setMinWidth(66);
 		newStock.setOnAction(e -> displayStockInfo(symbol));
