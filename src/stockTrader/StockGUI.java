@@ -117,7 +117,7 @@ public class StockGUI extends Application{
 		MenuItem credits = new MenuItem("Credits");
 		about.getItems().add(credits);
 		// Display Credits
-		credits.setOnAction(e -> AlertBox.display("About Stock Advisor", "Stock Advisor was created by Alessandra Shipman & Andrew Thomas"));
+		credits.setOnAction(e -> AlertBox.display("About Stock Advisor", "\nStock Advisor was created by Alessandra Shipman & Andrew Thomas\nAll Financial Data from Yahoo! Finance\n(C) 2016"));
 
 		
 		// Dynamically create button for each stock in array

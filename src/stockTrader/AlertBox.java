@@ -3,9 +3,10 @@ package stockTrader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -17,8 +18,9 @@ public class AlertBox {
 		window.setTitle(title);
 		window.setMinWidth(250);
 		
-		Label label = new Label();
+		Text label = new Text();
 		label.setText(message);
+		label.setTextAlignment(TextAlignment.CENTER);
 		
 		Button okayButton = new Button("Okay");
 		okayButton.setOnAction(e -> window.close());
