@@ -60,7 +60,14 @@ public class StockGUI extends Application{
 		symbolArray.add("FB");
 		symbolArray.add("MSFT");
 		symbolArray.add("GOOGL");
-
+		
+		Polygon shortRecShape = new Polygon();
+		Polygon longRecShape = new Polygon();
+		Text shortRecText = new Text();
+		Text longRecText = new Text();
+		shortRecText.setFont(Font.font("Helvetica", FontWeight.BOLD, 18));
+		longRecText.setFont(Font.font("Helvetica", FontWeight.BOLD, 18));
+		
 		int numStocks = symbolArray.size(); // number of stocks
 		// Menu and Button ArrayLists to Dynamically Create Menus and Buttons
 		ArrayList<MenuItem> stocksDelete = new ArrayList<MenuItem>(numStocks);
@@ -78,7 +85,7 @@ public class StockGUI extends Application{
 		Menu managePortfolio = new Menu("Portfolio Management");
 		// Add Stock menuItem for adding new stock to portfolio
 		MenuItem addStock = new MenuItem("Add a Stock");
-		addStock.setOnAction(e -> addStock(symbolArray, stocksView, stocksDelete, leftBar, deleteStock));
+		addStock.setOnAction(e -> addStock(symbolArray, stocksView, stocksDelete, leftBar, deleteStock, shortRecShape, longRecShape, shortRecText, longRecText));
 		
 		// Create Dynamic Menu
 		for (int i = 0; i < numStocks; i++){	
@@ -113,7 +120,7 @@ public class StockGUI extends Application{
 			stocksView.add(i, new Button(symbolArray.get(i)));
 			stocksView.get(i).setMaxWidth(66);
 			stocksView.get(i).setMinWidth(66);
-			stocksView.get(i).setOnAction(e -> displayStockInfo(tempSymbol));
+			stocksView.get(i).setOnAction(e -> displayStockInfo(tempSymbol, shortRecShape, longRecShape, shortRecText, longRecText));
 		}
 		
 		// Add dynamic buttons to leftBar
@@ -123,17 +130,17 @@ public class StockGUI extends Application{
 		BorderPane bPane = new BorderPane();
 		BorderPane aPane = new BorderPane();
 		
-		HBox recPane = new HBox(10);
-		Text recText = new Text("Recommendation: Buy");
-		recText.setFont(Font.font("Helvetica", FontWeight.BOLD, 18));
-
-		Polygon upArrow = new Polygon(
-				10, 0,
-				0, 10,
-				20, 10);
-		upArrow.setFill(Color.GREEN);
-		recPane.getChildren().addAll(recText, upArrow);
-		recPane.setAlignment(Pos.CENTER);
+		VBox recPane = new VBox(10);
+		HBox shortRecPane = new HBox(10);
+		HBox longRecPane = new HBox(10);
+		
+		shortRecPane.getChildren().addAll(shortRecText, shortRecShape);
+		shortRecPane.setAlignment(Pos.CENTER);
+		
+		longRecPane.getChildren().addAll(longRecText, longRecShape);
+		longRecPane.setAlignment(Pos.CENTER);
+		
+		recPane.getChildren().addAll(shortRecPane, longRecPane);
 		
 		// MenuBar holds previously created menus
 		MenuBar toolbar = new MenuBar(file, about);
@@ -233,10 +240,8 @@ public class StockGUI extends Application{
 		bPane.setCenter(aPane);
 		bPane.setLeft(leftBar);
 		
-		
 		// Set some margins
 		BorderPane.setMargin(leftBar, new Insets(25, 10, 10, 10));
-		
 		
 		// Display scene
 		Scene scene = new Scene(bPane);
@@ -246,7 +251,8 @@ public class StockGUI extends Application{
 						
 	}
 
-	private void addStock(ArrayList<String> symbolArray, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file) {		
+	private void addStock(ArrayList<String> symbolArray, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file, 
+			Polygon shortRecShape, Polygon longRecShape, Text shortRecText, Text longRecText) {		
 		Stage addStockwindow = new Stage();
 
 		addStockwindow.initModality(Modality.APPLICATION_MODAL);
@@ -257,7 +263,7 @@ public class StockGUI extends Application{
 		TextField symbolTB = new TextField();
 				
 		Button okay = new Button("Add");
-		okay.setOnAction(e -> addToStockArray(symbolTB, symbolArray, addStockwindow, stocksView, stocksDelete, leftBar, file));
+		okay.setOnAction(e -> addToStockArray(symbolTB, symbolArray, addStockwindow, stocksView, stocksDelete, leftBar, file, shortRecShape, longRecShape, shortRecText, longRecText));
 		
 		Button cancel = new Button("Cancel");
 		cancel.setOnAction(e -> addStockwindow.close());
@@ -275,12 +281,13 @@ public class StockGUI extends Application{
 		
 	}
 
-	private void addToStockArray(TextField input, ArrayList<String> symbolIn, Stage addStockwindow, ArrayList<Button> stocksView, ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file) {
+	private void addToStockArray(TextField input, ArrayList<String> symbolIn, Stage addStockwindow, ArrayList<Button> stocksView, 
+			ArrayList<MenuItem> stocksDelete, VBox leftBar, Menu file, Polygon shortRecShape, Polygon longRecShape, Text shortRecText, Text longRecText) {
 		String symbolInput = input.getText();
 		Stock tempStock = StockFetcher.getStock(symbolInput);
 		if(!(tempStock.getName().equals("N/A"))){
 			symbolIn.add(symbolInput);
-			addNewStockButton(symbolInput, stocksView, leftBar);
+			addNewStockButton(symbolInput, stocksView, leftBar, shortRecShape, longRecShape, shortRecText, longRecText);
 			addNewStockMenuItem(symbolInput, symbolIn, stocksView, stocksDelete, leftBar, file);
 			addStockwindow.close();
 		}
@@ -288,11 +295,11 @@ public class StockGUI extends Application{
 			AlertBox.display("Invalid Symbol", "ERROR: Stock Not Found. Please Try Again.");
 	}
 	
-	private void addNewStockButton(String symbol, ArrayList<Button> stocksView, VBox leftBar){
+	private void addNewStockButton(String symbol, ArrayList<Button> stocksView, VBox leftBar, Polygon shortRecShape, Polygon longRecShape, Text shortRecText, Text longRecText){
 		Button newStock = new Button(symbol.toUpperCase());
 		newStock.setMaxWidth(66);
 		newStock.setMinWidth(66);
-		newStock.setOnAction(e -> displayStockInfo(symbol));
+		newStock.setOnAction(e -> displayStockInfo(symbol, shortRecShape, longRecShape, shortRecText, longRecText));
 		stocksView.add(newStock);
 		leftBar.getChildren().clear();
 		leftBar.getChildren().addAll(stocksView);
@@ -319,9 +326,11 @@ public class StockGUI extends Application{
 		leftBar.getChildren().addAll(stocksView);
 	}
 
-	public void displayStockInfo(String symbol) {
+	public void displayStockInfo(String symbol, Polygon shortRecShape, Polygon longRecShape, Text shortRecText, Text longRecText) {
 		// Get stock info for given symbol
 		Stock tempStock = StockFetcher.getStock(symbol);
+		// Calculate Recommendations
+		tempStock.calcRecommendations();
 		
 		// Display name at top of window
 		name.setText(tempStock.getName());
@@ -348,7 +357,78 @@ public class StockGUI extends Application{
 		tbexchange.setText(tempStock.getExchange());
 		tbmovingav200Day.setText("" + money.format(tempStock.getMovingav200Day()));
 		
-
+		if (tempStock.getShortTermRec().equals("Buy Now!") || tempStock.getShortTermRec().equals("Buy")){
+			Polygon upArrow = new Polygon(
+				10, 0,
+				0, 10,
+				20, 10);
+			upArrow.setFill(Color.GREEN);
+			
+			shortRecShape = upArrow;
+			shortRecText.setText("Short Term Recommendation: Buy");
+		}
+		
+		else if(tempStock.getShortTermRec().equals("Sell Now!") || tempStock.getShortTermRec().equals("Sell")){
+			Polygon downArrow = new Polygon(
+				10,10,
+				0, 0,
+				20, 0);
+			downArrow.setFill(Color.RED);
+			
+			shortRecShape = downArrow;
+			shortRecText.setText("Short Term Recommendation: Sell");
+		}
+		
+		else if(tempStock.getShortTermRec().equals("Hold")){
+			Polygon holdLine= new Polygon(
+				0,0,
+				0,6,
+				20,6,
+				20,0);
+			holdLine.setFill(Color.BLUE);
+			shortRecShape = holdLine;
+			shortRecText.setText("Short Term Recommendation: Hold");
+		}
+		else{
+			shortRecText.setText("Insufficient Data - No Short Term Recommendation");
+		}
+		
+		if (tempStock.getLongTermRec().equals("Buy")){
+			Polygon upArrow = new Polygon(
+				10, 0,
+				0, 10,
+				20, 10);
+			upArrow.setFill(Color.GREEN);
+			
+			longRecShape = upArrow;
+			longRecText.setText("Long Term Recommendation: Buy");
+		}
+		
+		else if(tempStock.getLongTermRec().equals("Sell")){
+			Polygon downArrow = new Polygon(
+				10,10,
+				0, 0,
+				20, 0);
+			downArrow.setFill(Color.RED);
+			
+			longRecShape = downArrow;
+			longRecText.setText("Long Term Recommendation: Sell");
+		}
+		
+		else if(tempStock.getLongTermRec().equals("Hold")){
+			Polygon holdLine= new Polygon(
+				0,0,
+				0,6,
+				20,6,
+				20,0);
+			holdLine.setFill(Color.BLUE);
+			longRecShape = holdLine;
+			longRecText.setText("Long Term Recommendation: Hold");
+		}
+		else{
+			longRecText.setText("Insufficient Data - No Long Term Recommendation");
+		}
+			
 	}
 	
 	public static void main(String[] args){

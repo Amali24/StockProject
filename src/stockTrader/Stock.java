@@ -26,9 +26,12 @@ public class Stock {
 	private double ratioPriceToOpen = 1;
 	private double ratioCurrentTo50Day = 1;
 	private double ratio50Dayto200Day = 1;
-	private double shortTermRec = 1;
-	private double longTermRec = 1;
-	private double shortConfidence = 1;
+	private double numShortTerm = 1;
+	private double numLongTerm = 1;
+	private double marketConfidence = 1;
+	
+	private String shortTermRec = "";
+	private String longTermRec = "";
 	
 	
 	/////////////Constructors///////////////
@@ -90,21 +93,43 @@ public class Stock {
 	
 	public void calcConfidenceMetrics(){
 		if (shortRatio > 1 && shortRatio < 10)
-			shortConfidence = -1 / 100 * Math.pow(shortRatio, 2) + 1;
+			marketConfidence = -1 / 100 * Math.pow(shortRatio, 2) + 1;
 		
 		else if(shortRatio > 10)
-			shortConfidence = .001;
+			marketConfidence = .001;
 	}
 		
-		public void calcRecomendations(){
+		public void calcRecommendations(){
+			calcPriceTrends();
+			calcConfidenceMetrics();
+			
 		//Recommendations based on trends
-		shortTermRec = ratioCurrentTo50Day * shortConfidence;
-		longTermRec = ratio50Dayto200Day * ratioCurrentTo50Day;
+		numShortTerm = ratioCurrentTo50Day * marketConfidence;
+		numLongTerm = ratio50Dayto200Day * ratioCurrentTo50Day;
 		
-		if (ratioPriceToOpen > 3)
-			shortTermRec = 10;
-		if (ratioPriceToOpen < .3)
-			shortTermRec = 0;		
+		if (ratioPriceToOpen > 3){
+			setShortTermRec("Buy Now!");
+		}else if (ratioPriceToOpen < .3){
+			setShortTermRec("Short now!");	
+		}else if(numShortTerm > 1.05){
+			setShortTermRec("Buy");
+		}else if(numShortTerm < 1.05 && numShortTerm > .99){
+			setShortTermRec("Hold");
+		}else if(numShortTerm < .99){
+			setShortTermRec("Short");
+		}else{
+			setShortTermRec("No Reccomendation");
+		}
+		
+		if(numLongTerm > 1.05){
+			setLongTermRec("Buy");
+		}else if(numLongTerm < 1.05 && numLongTerm > .99) {
+			setLongTermRec("Hold");
+		}else if(numLongTerm < .99){
+			setLongTermRec("Sell");
+		}else{
+			setLongTermRec("No Reccomendation");
+		}	
 	}
 
 		
@@ -161,7 +186,7 @@ public class Stock {
 		else if (this.exchange.equals("NYQ"))
 			return "NYSE";
 		else
-			return "UNKNOWN MARKET(" + this.exchange + ")";
+			return "Other" + " (" + this.exchange + ")";
 	}	
 	public double getShortRatio(){
 		return this.shortRatio;
@@ -175,11 +200,23 @@ public class Stock {
 	public int getAvgDailyVolume(){
 		return avgDailyVolume;
 	}
-	public double getShortTermRec(){
-		return this.shortTermRec;
+	public double getnumShortTermRec(){
+		return this.numShortTerm;
 	}
-	public double getLongTermRec(){
-		return this.longTermRec;
+	public double getnumLongTermRec(){
+		return this.numLongTerm;
+	}
+	public String getShortTermRec() {
+		return shortTermRec;
+	}
+	public void setShortTermRec(String shortTermRec) {
+		this.shortTermRec = shortTermRec;
+	}
+	public String getLongTermRec() {
+		return longTermRec;
+	}
+	public void setLongTermRec(String longTermRec) {
+		this.longTermRec = longTermRec;
 	}
 	
 	////// Setters not included as all data is set upon creation and should not be manually altered //////
